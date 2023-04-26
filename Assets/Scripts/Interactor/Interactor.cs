@@ -9,15 +9,7 @@ namespace Interactor
 {
     public class Interactor : MonoBehaviour
     {
-        /// <summary>
-        /// Collider that activates on "Interact" tap
-        /// </summary>
-        [SerializeField] private Collider2D interactorColliderTop;
-
-        [SerializeField] private Collider2D interactorColliderRight;
-        [SerializeField] private Collider2D interactorColliderLeft;
-        [SerializeField] private Collider2D interactorColliderBottom;
-
+        [SerializeField] private float interactionDistance = 1.2f;
         private Locomotion.Locomotion _locomotion;
         private PlayerInputAction _playerInputAction;
 
@@ -45,8 +37,6 @@ namespace Interactor
             {
                 throw new MissingComponentException("Locomotion component is missing");
             }
-
-            _disableAllColliders();
         }
 
 
@@ -55,52 +45,30 @@ namespace Interactor
         {
             if (_getInteractAction().WasPerformedThisFrame())
             {
-                var direction = _locomotion.GetDirection();
-                var colliderToActivate = GetColliderForDirection(direction);
-                colliderToActivate.gameObject.SetActive(true);
-                StartCoroutine(DelayedDisableCollidersCoroutine());
+                _onPerformActionTapped();
             }
         }
 
-        private IEnumerator DelayedDisableCollidersCoroutine()
+        private void _onPerformActionTapped()
         {
-            yield return new WaitForSeconds(0.1f);
-            _disableAllColliders();
-        }
-
-        private Collider2D GetColliderForDirection(Direction direction)
-        {
-            switch (direction)
+            Vector2 position = transform.position;
+            RaycastHit2D[] hitResults = Physics2D.RaycastAll(
+                position,
+                _locomotion.GetDirectionVector(),
+                interactionDistance);
+            foreach (var hit in hitResults)
             {
-                case Direction.Top:
-                    return interactorColliderTop;
-                case Direction.Left:
-                    return interactorColliderLeft;
-                case Direction.Right:
-                    return interactorColliderRight;
-                case Direction.Bottom:
-                    return interactorColliderBottom;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                if (hit.collider.gameObject == transform.root.gameObject)
+                {
+                    //Avoid hitting object that shoot ray
+                    continue;
+                }
+
+                var interactableComponent = hit.collider.gameObject.GetComponent<IInteractable>();
+                interactableComponent?.OnInteractionTriggered(transform.root.gameObject);
             }
         }
 
-        private void _disableAllColliders()
-        {
-            interactorColliderTop.gameObject.SetActive(false);
-            interactorColliderRight.gameObject.SetActive(false);
-            interactorColliderLeft.gameObject.SetActive(false);
-            interactorColliderBottom.gameObject.SetActive(false);
-        }
-
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other.isTrigger)
-            {
-                var interactable = other.GetComponent<IInteractable>();
-                interactable?.OnInteractionTriggered(this.GameObject());
-            }
-        }
 
         private InputAction _getInteractAction()
         {
