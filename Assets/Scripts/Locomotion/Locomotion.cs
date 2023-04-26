@@ -4,23 +4,16 @@ using UnityEngine.InputSystem;
 
 namespace Locomotion
 {
-    enum Direction
-    {
-        Top,
-        Left,
-        Right,
-        Bottom,
-    }
-
     public class Locomotion : MonoBehaviour
     {
-        private PlayerInputAction _playerInputAction;
-        private Direction _playerDirection;
         [SerializeField] private float speed = 5;
 
-        private InputAction _getMoveAction()
+        private PlayerInputAction _playerInputAction;
+        private Direction _direction;
+
+        public Direction GetDirection()
         {
-            return _playerInputAction.Player.Move;
+            return _direction;
         }
 
         private void Awake()
@@ -44,7 +37,6 @@ namespace Locomotion
             var moveInput = _getMoveAction().ReadValue<Vector2>();
             UpdatePlayerDirection(moveInput);
 
-
             if (moveInput == new Vector2())
             {
                 // No input
@@ -59,7 +51,7 @@ namespace Locomotion
         // Player should be able to move only vertical or only horizontal. No diagonal move is allowed
         private Vector2 GetPlayerDirectionVector()
         {
-            return _playerDirection switch
+            return _direction switch
             {
                 Direction.Top => new Vector2(0, 1),
                 Direction.Left => new Vector2(-1, 0),
@@ -73,20 +65,25 @@ namespace Locomotion
         {
             if (moveInput.x > 0)
             {
-                _playerDirection = Direction.Right;
+                _direction = Direction.Right;
             }
             else if (moveInput.x < 0)
             {
-                _playerDirection = Direction.Left;
+                _direction = Direction.Left;
             }
             else if (moveInput.y > 0)
             {
-                _playerDirection = Direction.Top;
+                _direction = Direction.Top;
             }
             else if (moveInput.y < 0)
             {
-                _playerDirection = Direction.Bottom;
+                _direction = Direction.Bottom;
             }
+        }
+
+        private InputAction _getMoveAction()
+        {
+            return _playerInputAction.Player.Move;
         }
     }
 }
