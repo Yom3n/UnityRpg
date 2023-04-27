@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
-using Locomotion;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
 namespace Interactor
 {
     public class Interactor : MonoBehaviour
@@ -17,6 +13,12 @@ namespace Interactor
         private void Awake()
         {
             _playerInputAction = new PlayerInputAction();
+            _getInteractAction().performed += _onPerformActionTapped;
+        }
+
+        void OnDestroy()
+        {
+            _getInteractAction().performed -= _onPerformActionTapped;
         }
 
         private void OnEnable()
@@ -40,16 +42,7 @@ namespace Interactor
         }
 
 
-        // Update is called once per frame
-        void Update()
-        {
-            if (_getInteractAction().WasPerformedThisFrame())
-            {
-                _onPerformActionTapped();
-            }
-        }
-
-        private void _onPerformActionTapped()
+        private void _onPerformActionTapped(InputAction.CallbackContext context)
         {
             Vector2 position = transform.position;
             RaycastHit2D[] hitResults = Physics2D.RaycastAll(
