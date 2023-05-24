@@ -1,21 +1,17 @@
+using Dialog;
+using Ink.Runtime;
 using UnityEngine;
 
 namespace Interactor
 {
     public class Leaver : MonoBehaviour, IInteractable
     {
-        // Start is called before the first frame update
-        void Start()
-        {
-        }
+        [SerializeField] private TextAsset dialogAsset;
 
-        // Update is called once per frame
-        void Update()
-        {
-        }
 
-        public void OnInteractionTriggered(GameObject gameObject)
+        public void OnInteractionTriggered(GameObject other)
         {
+            DialogManager.GetInstance().EnterDialogMode(dialogAsset);
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.flipX = !spriteRenderer.flipX;
         }

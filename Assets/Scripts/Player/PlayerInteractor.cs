@@ -1,12 +1,15 @@
+using Interactor;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-namespace Interactor
+
+
+namespace Player
 {
-    public class Interactor : MonoBehaviour
+    public class PlayerInteractor : MonoBehaviour
     {
         [SerializeField] private float interactionDistance = 1.2f;
-        private Locomotion.Locomotion _locomotion;
+        private PlayerLocomotion _playerLocomotion;
         private PlayerInputAction _playerInputAction;
 
 
@@ -34,8 +37,8 @@ namespace Interactor
         // Start is called before the first frame update
         void Start()
         {
-            _locomotion = GetComponent<Locomotion.Locomotion>();
-            if (_locomotion == null)
+            _playerLocomotion = GetComponent<PlayerLocomotion>();
+            if (_playerLocomotion == null)
             {
                 throw new MissingComponentException("Locomotion component is missing");
             }
@@ -47,7 +50,7 @@ namespace Interactor
             Vector2 position = transform.position;
             RaycastHit2D[] hitResults = Physics2D.RaycastAll(
                 position,
-                _locomotion.GetDirectionVector(),
+                _playerLocomotion.GetDirectionVector(),
                 interactionDistance);
             foreach (var hit in hitResults)
             {

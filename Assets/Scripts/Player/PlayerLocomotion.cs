@@ -1,15 +1,17 @@
 using System;
+using Dialog;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Locomotion
+namespace Player
 {
-    public class Locomotion : MonoBehaviour
+    public class PlayerLocomotion : MonoBehaviour
     {
         [SerializeField] private float speed = 5;
 
         private PlayerInputAction _playerInputAction;
-        private Direction _direction = new Direction();
+        private Direction _direction = new();
+
 
         public Direction GetDirection()
         {
