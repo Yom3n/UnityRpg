@@ -7,7 +7,6 @@ namespace Player
 {
     public class PlayerLocomotion : MonoBehaviour
     {
-        [SerializeField] private DialogManager dialogManager;
         [SerializeField] private float speed = 5;
 
         private PlayerInputAction _playerInputAction;
@@ -27,7 +26,6 @@ namespace Player
         private void Awake()
         {
             _playerInputAction = new PlayerInputAction();
-            dialogManager.OnDialogStatusChanged += OnDialogStatusChanged;
         }
 
         private void OnEnable()
@@ -40,10 +38,6 @@ namespace Player
             _getMoveAction().Disable();
         }
 
-        public void OnDestroy()
-        {
-            dialogManager.OnDialogStatusChanged -= OnDialogStatusChanged;
-        }
 
         private void FixedUpdate()
         {
@@ -66,24 +60,6 @@ namespace Player
         private InputAction _getMoveAction()
         {
             return _playerInputAction.Player.Move;
-        }
-
-        private void OnDialogStatusChanged(DialogManagerStatus status)
-        {
-            switch (status)
-            {
-                case DialogManagerStatus.notActive:
-                    enabled = true;
-                    break;
-                case DialogManagerStatus.canContinue:
-                    enabled = false;
-                    break;
-                case DialogManagerStatus.canEnd:
-                    enabled = false;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
-            }
         }
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using Dialog;
 using Interactor;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -10,7 +8,6 @@ namespace Player
 {
     public class PlayerInteractor : MonoBehaviour
     {
-        [SerializeField] private DialogManager dialogManager;
         [SerializeField] private float interactionDistance = 1.2f;
         private PlayerLocomotion _playerLocomotion;
         private PlayerInputAction _playerInputAction;
@@ -19,26 +16,23 @@ namespace Player
         private void Awake()
         {
             _playerInputAction = new PlayerInputAction();
-            dialogManager.OnDialogStatusChanged += OnDialogStatusChanged;
+            _getInteractAction().performed += _onPerformActionTapped;
         }
 
         void OnDestroy()
         {
-            dialogManager.OnDialogStatusChanged -= OnDialogStatusChanged;
+            _getInteractAction().performed -= _onPerformActionTapped;
         }
 
         private void OnEnable()
         {
-            _getInteractAction().performed += _onPerformActionTapped;
             _getInteractAction().Enable();
         }
 
         private void OnDisable()
         {
             _getInteractAction().Disable();
-            _getInteractAction().performed -= _onPerformActionTapped;
         }
-
 
         // Start is called before the first frame update
         void Start()
@@ -75,24 +69,6 @@ namespace Player
         private InputAction _getInteractAction()
         {
             return _playerInputAction.Player.Interact;
-        }
-
-        private void OnDialogStatusChanged(DialogManagerStatus status)
-        {
-            switch (status)
-            {
-                case DialogManagerStatus.notActive:
-                    enabled = true;
-                    break;
-                case DialogManagerStatus.canContinue:
-                    enabled = false;
-                    break;
-                case DialogManagerStatus.canEnd:
-                    enabled = false;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
-            }
         }
     }
 }

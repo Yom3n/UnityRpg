@@ -5554,7 +5554,7 @@ GameObject:
   - component: {fileID: 1534758324}
   - component: {fileID: 1534758323}
   m_Layer: 0
-  m_Name: BlockingTile
+  m_Name: tileset-sliced_395
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5597,7 +5597,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -6810,18 +6810,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7471983784797142629, guid: 74003386064bf1d4c8d6f53f9d0d9fe0, type: 3}
-      propertyPath: dialogManager
-      value: 
-      objectReference: {fileID: 756104004}
-    - target: {fileID: 8103769891700777026, guid: 74003386064bf1d4c8d6f53f9d0d9fe0, type: 3}
-      propertyPath: dialogManager
-      value: 
-      objectReference: {fileID: 756104004}
     - target: {fileID: 8103769891700777026, guid: 74003386064bf1d4c8d6f53f9d0d9fe0, type: 3}
       propertyPath: interactionDistance
       value: 1.2
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 7389166724745874301, guid: 74003386064bf1d4c8d6f53f9d0d9fe0, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74003386064bf1d4c8d6f53f9d0d9fe0, type: 3}
