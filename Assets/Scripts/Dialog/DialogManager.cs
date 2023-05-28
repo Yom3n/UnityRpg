@@ -7,16 +7,6 @@ using UnityEngine.InputSystem;
 
 namespace Dialog
 {
-    public enum DialogManagerStatus
-    {
-        notActive,
-
-        // generatingText,
-        canContinue,
-        canEnd,
-    }
-
-
     public class DialogManager : MonoBehaviour
     {
         public event Action<DialogManagerStatus> OnDialogStatusChanged;
