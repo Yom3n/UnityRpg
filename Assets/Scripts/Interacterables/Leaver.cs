@@ -8,7 +8,8 @@ namespace Interactor
 {
     public class Leaver : MonoBehaviour, IInteractable
     {
-        public GameObject SwichableGameObject;
+        public GameObject[] swichableGameObjects;
+
         [SerializeField] private TextAsset dialogAsset;
 
         public void Toggle()
@@ -16,16 +17,18 @@ namespace Interactor
             DialogManager.GetInstance().EnterDialogMode(dialogAsset);
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.flipX = !spriteRenderer.flipX;
-            var client = SwichableGameObject.GetComponent<ISwitchable>();
 
-            if (client.IsActive)
+            foreach (var swichableGameObject in swichableGameObjects)
             {
-                client.OnDeactivate();
-         
-            }
-            else
-            {
-                client.OnActivate();
+                var client = swichableGameObject.GetComponent<ISwitchable>();
+                if (client.IsActive)
+                {
+                    client.OnDeactivate();
+                }
+                else
+                {
+                    client.OnActivate();
+                }
             }
         }
 
