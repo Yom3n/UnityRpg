@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using Dialog;
 using UnityEngine;
 
-// TODO Do we need Player class? How about moving all the logic for disabling locomotion and interactor to Locomotion and Interactor classes? 
+// Player zarządzający komponentami na podsatwie zmian w dialogu? 
 namespace Player
 {
+    [RequireComponent(typeof(PlayerLocomotion), typeof(PlayerInteractor))]
     public class Player : MonoBehaviour
     {
         [SerializeField] private DialogManager _dialogManager;
