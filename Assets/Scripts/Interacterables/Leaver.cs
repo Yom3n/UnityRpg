@@ -1,3 +1,4 @@
+using System;
 using Dialog;
 using Ink.Runtime;
 using UnityEngine;
@@ -12,9 +13,21 @@ namespace Interactor
 
         [SerializeField] private TextAsset dialogAsset;
 
-        public void Toggle()
+        private void Start()
         {
-            DialogManager.GetInstance().EnterDialogMode(dialogAsset);
+            foreach (var swichable in swichableGameObjects)
+            {
+                if (swichable.GetComponent<ISwitchable>() == null)
+                {
+                    throw new MissingComponentException(
+                        $"{swichable.name} added to {this.name} does not have ISwichable interface!");
+                }
+            }
+        }
+
+        private void Toggle()
+        {
+            DialogManager.GetInstance().EnterDialogMode(dialogAsset,  OnChoiceSelected);
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.flipX = !spriteRenderer.flipX;
 
@@ -30,6 +43,11 @@ namespace Interactor
                     client.OnActivate();
                 }
             }
+        }
+
+        void OnChoiceSelected(Choice dialogChoice)
+        {
+            // if(dialogChoice.)
         }
 
         public void OnInteractionTriggered(GameObject gameObject)

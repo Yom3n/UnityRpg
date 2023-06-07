@@ -17,6 +17,12 @@ namespace Player
         {
             _playerInputAction = new PlayerInputAction();
             _getInteractAction().performed += _onPerformActionTapped;
+            
+            _playerLocomotion = GetComponent<PlayerLocomotion>();
+            if (_playerLocomotion == null)
+            {
+                throw new MissingComponentException("Locomotion component is missing");
+            }
         }
 
         void OnDestroy()
@@ -32,16 +38,6 @@ namespace Player
         private void OnDisable()
         {
             _getInteractAction().Disable();
-        }
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            _playerLocomotion = GetComponent<PlayerLocomotion>();
-            if (_playerLocomotion == null)
-            {
-                throw new MissingComponentException("Locomotion component is missing");
-            }
         }
 
 

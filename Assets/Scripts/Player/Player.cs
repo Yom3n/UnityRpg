@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Dialog;
 using UnityEngine;
 
-// Player zarządzający komponentami na podsatwie zmian w dialogu? 
 namespace Player
 {
     [RequireComponent(typeof(PlayerLocomotion), typeof(PlayerInteractor))]
@@ -13,40 +12,44 @@ namespace Player
         [SerializeField] private DialogManager _dialogManager;
         private PlayerState _playerState;
 
-        private void Start()
+        private void Awake()
         {
             SetPlayerState(PlayerState.Adventure);
+            if (_dialogManager == null)
+            {
+                throw new MissingComponentException("Player doesnt have DialogManager attached!");
+            }
         }
 
         private void OnEnable()
         {
-            _dialogManager.OnDialogStatusChanged += OnDialogStatusChanged;
+            _dialogManager.OnStateChanged += OnStatusChanged;
         }
 
         private void OnDisable()
         {
-            _dialogManager.OnDialogStatusChanged -= OnDialogStatusChanged;
+            _dialogManager.OnStateChanged -= OnStatusChanged;
         }
 
         private void SetPlayerState(PlayerState newState)
         {
             _playerState = newState;
             PlayerLocomotion playerLocomotion = GetComponent<PlayerLocomotion>();
-            if (playerLocomotion == null)
-            {
-                throw new MissingComponentException("Locomotion is null!");
-            }
+            PlayerInteractor playerInteractor = GetComponent<PlayerInteractor>();
 
             switch (newState)
             {
                 case PlayerState.Adventure:
                     playerLocomotion.enabled = true;
+                    playerInteractor.enabled = true;
                     break;
                 case PlayerState.InDialog:
                     playerLocomotion.enabled = false;
+                    playerInteractor.enabled = false;
                     break;
                 case PlayerState.InCombat:
                     playerLocomotion.enabled = false;
+                    playerInteractor.enabled = false;
                     break;
                 case PlayerState.Paused:
                     break;
@@ -55,7 +58,7 @@ namespace Player
             }
         }
 
-        private void OnDialogStatusChanged(DialogManagerStatus status)
+        private void OnStatusChanged(DialogManagerStatus status)
         {
             switch (status)
             {
