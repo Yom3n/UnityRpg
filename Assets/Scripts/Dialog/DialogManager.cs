@@ -65,19 +65,11 @@ namespace Dialog
             SetDialogStatus(DialogManagerStatus.notActive);
         }
 
-        private void OnEnable()
+
+        private void ListenForPlayerInput()
         {
             _playerInputAction.Enable();
-            StartCoroutine(DelayedActivatePlayerInputCorutine());
-
-        }
-
-        private IEnumerator DelayedActivatePlayerInputCorutine() //Nah, it doesnt work. Can be deleted
-        {
-            yield return new WaitForEndOfFrame();
             _playerInputAction.Player.Interact.performed += OnContinueTap;
-            StopCoroutine(DelayedActivatePlayerInputCorutine());
-            
         }
 
         private void OnDisable()
@@ -102,6 +94,7 @@ namespace Dialog
         public void EnterDialogMode(TextAsset inkJson, Action<Choice> callback = null)
         {
             if (dialogPanel.activeSelf) return;
+            ListenForPlayerInput();
             SetDialogStatus(DialogManagerStatus.canContinue);
             _currentStory = new Story(inkJson.text);
             dialogPanel.SetActive(true);
