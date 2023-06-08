@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Dialog;
 using Ink.Runtime;
 using UnityEngine;
@@ -9,6 +10,11 @@ namespace Interactor
 {
     public class Leaver : MonoBehaviour, IInteractable
     {
+        /// <summary>
+        /// Whenever this tag will be used in dialog, lever will be activated
+        /// </summary>
+        [SerializeField] private String toggleTagName = "action:lever_moved";
+
         public GameObject[] swichableGameObjects;
 
         [SerializeField] private TextAsset dialogAsset;
@@ -25,9 +31,22 @@ namespace Interactor
             }
         }
 
+        public void OnInteractionTriggered(GameObject gameObject)
+        {
+            DialogManager.GetInstance().EnterDialogMode(dialogAsset, OnStoryChanged);
+        }
+
+        void OnStoryChanged(DialogData data)
+        {
+            if (data.tags.Count == 0) return;
+            if (data.tags.Any(dialogTag => dialogTag == toggleTagName))
+            {
+                Toggle();
+            }
+        }
+
         private void Toggle()
         {
-            DialogManager.GetInstance().EnterDialogMode(dialogAsset,  OnChoiceSelected);
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.flipX = !spriteRenderer.flipX;
 
@@ -43,16 +62,6 @@ namespace Interactor
                     client.OnActivate();
                 }
             }
-        }
-
-        void OnChoiceSelected(Choice dialogChoice)
-        {
-            // if(dialogChoice.)
-        }
-
-        public void OnInteractionTriggered(GameObject gameObject)
-        {
-            Toggle();
         }
     }
 }

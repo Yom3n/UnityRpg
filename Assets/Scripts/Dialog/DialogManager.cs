@@ -7,7 +7,9 @@ using JetBrains.Annotations;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace Dialog
 {
@@ -24,12 +26,12 @@ namespace Dialog
     public class DialogManager : MonoBehaviour
     {
         public event Action<DialogManagerStatus> OnStateChanged;
-        private Action<Choice> OnChoiceSelected;
+        private Action<DialogData> OnStoryChanged;
 
         [SerializeField] private GameObject dialogPanel;
         [SerializeField] private TextMeshProUGUI dialogText;
 
-        [SerializeField] private TextMeshProUGUI[] choicesTexts;
+        [SerializeField] private GameObject[] choicesUI;
 
         private static DialogManager _instance;
 
@@ -45,8 +47,7 @@ namespace Dialog
             {
                 throw new Exception("Story is null!");
             }
-
-            OnChoiceSelected.Invoke(_currentStory.currentChoices[choiceIndex]);
+            
             _currentStory.ChooseChoiceIndex(choiceIndex);
             ContinueStory();
         }
@@ -58,7 +59,6 @@ namespace Dialog
             {
                 _instance = this;
             }
-
             dialogPanel.SetActive(false);
             dialogText.text = "";
             _currentStory = null;
@@ -91,15 +91,16 @@ namespace Dialog
         }
 
 
-        public void EnterDialogMode(TextAsset inkJson, Action<Choice> callback = null)
+        public void EnterDialogMode(TextAsset inkJson, Action<DialogData> callback = null)
         {
             if (dialogPanel.activeSelf) return;
+            OnStoryChanged = callback;
             ListenForPlayerInput();
             SetDialogStatus(DialogManagerStatus.canContinue);
             _currentStory = new Story(inkJson.text);
             dialogPanel.SetActive(true);
             ContinueStory();
-            OnChoiceSelected = callback;
+
         }
 
         private void ExitDialogMode()
@@ -111,7 +112,7 @@ namespace Dialog
 
         private void ContinueStory()
         {
-            if (_currentStory?.currentChoices != null && _currentStory.currentChoices.Count() != 0)
+            if (_currentStory?.currentChoices != null && _currentStory.currentChoices.Count() > 0)
             {
                 Debug.Log("Can't continue. Select choice");
                 return;
@@ -121,26 +122,10 @@ namespace Dialog
             {
                 if (_currentStory == null) return;
                 dialogText.text = _currentStory.Continue();
-                var choices = _currentStory?.currentChoices;
-                if (choicesTexts.Length < choices.Count())
-                {
-                    throw new Exception(
-                        "Not enough space to show all of the choices!"); // TODO Change to DialogException
-                }
-
-                for (int i = 0; i < choices.Count; i++)
-                {
-                    choicesTexts[i].text = choices[i].text;
-                }
-
-                // Clear text for not used choices
-                for (int i = choices.Count(); i < choicesTexts.Length; i++)
-                {
-                    choicesTexts[i].text = "";
-                }
-
-
-                if (_currentStory != null && !_currentStory.canContinue)
+                _DisplayChoices();
+                OnStoryChanged?.Invoke(new DialogData(_currentStory.currentText, _currentStory.currentTags
+                    ));
+                if (_currentStory != null && !_currentStory.canContinue && _currentStory.currentChoices.Count() == 0)
                 {
                     SetDialogStatus(DialogManagerStatus.canEnd);
                 }
@@ -151,10 +136,43 @@ namespace Dialog
             }
         }
 
+        private void _DisplayChoices()
+        {
+            var choices = _currentStory?.currentChoices;
+            if (choicesUI.Length < choices.Count())
+            {
+                throw new Exception(
+                    "Not enough space to show all of the choices!"); // TODO Change to DialogException
+            }
+
+            for (int i = 0; i < choices.Count; i++)
+            {
+                choicesUI[i].GetComponentInChildren<TextMeshProUGUI>().text = choices[i].text;
+                StartCoroutine(SelectFirstChoice());
+            }
+
+            // Clear text for not used choices
+            for (int i = choices.Count(); i < choicesUI.Length; i++)
+            {
+                choicesUI[i].GetComponentInChildren<TextMeshProUGUI>().text = "";
+            }
+        }
+
         private void SetDialogStatus(DialogManagerStatus status)
         {
             this.status = status;
             OnStateChanged?.Invoke(status);
+        }
+
+        /// <summary>
+        /// Selects first choice in the dialog, to let user select choices with arrows
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator SelectFirstChoice()
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+            yield return new WaitForEndOfFrame();
+            EventSystem.current.SetSelectedGameObject(choicesUI[0]);
         }
     }
 }
