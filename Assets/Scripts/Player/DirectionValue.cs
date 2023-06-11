@@ -1,10 +1,11 @@
 using System;
 using UnityEngine;
 
-namespace Locomotion
+namespace Player
 {
     public class Direction
     {
+        
         public Direction()
         {
             _value = DirectionValue.Bottom;

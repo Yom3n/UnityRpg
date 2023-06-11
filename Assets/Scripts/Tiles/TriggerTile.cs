@@ -9,8 +9,6 @@ public class TriggerTile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Triggered tile");
-        Debug.Log(other.name);
         OnTileTriggered?.Invoke(other);
     }
 }
